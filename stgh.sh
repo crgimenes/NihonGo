@@ -1,7 +1,9 @@
 #!/bin/bash
 
 REPO_NAME="NihonGo"
-FOSSIL_FILE="~/Projects/fossilized/$REPO_NAME.fossil"
+FOSSIL_DIR="${HOME}/Projects/fossilized"
+FOSSIL_FILE="${FOSSIL_DIR}/${REPO_NAME}.fossil"
+echo "Fossil file: ${FOSSIL_FILE}"
 GITHUB_REPO_URL="https://github.com/crgimenes/$REPO_NAME.git"
 TEMP_DIR="temp_git_repo"
 
