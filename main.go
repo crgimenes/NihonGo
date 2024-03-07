@@ -23,7 +23,7 @@ func readLine() (string, error) {
 	if err != nil {
 		return "", fmt.Errorf("failed setting stdin to raw mode: %w", err)
 	}
-	tty := term.NewTerminal(os.Stdin, "")
+	tty := term.NewTerminal(os.Stdin, "> ")
 	line, err := tty.ReadLine()
 	_ = term.Restore(int(os.Stdin.Fd()), oldState)
 
@@ -43,7 +43,6 @@ func main() {
 
 	defer db.Close()
 
-	fmt.Printf("> ")
 	line, err := readLine()
 	if err != nil {
 		panic(err)
