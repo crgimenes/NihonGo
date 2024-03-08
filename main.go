@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"time"
 
 	"github.com/jmoiron/sqlx"
 	"golang.org/x/term"
@@ -14,7 +15,7 @@ const (
 	connectionString = `file:nihongo.db?mode=rwc&_journal_mode=WAL&_busy_timeout=10000`
 )
 
-func readLine() (string, error) {
+func readLine(prompt string) (string, error) {
 	if !term.IsTerminal(int(os.Stdin.Fd())) {
 		return "", fmt.Errorf("pipe not supported")
 	}
@@ -23,7 +24,21 @@ func readLine() (string, error) {
 	if err != nil {
 		return "", fmt.Errorf("failed setting stdin to raw mode: %w", err)
 	}
-	tty := term.NewTerminal(os.Stdin, "> ")
+	tty := term.NewTerminal(os.Stdin, prompt)
+
+	width, height, err := term.GetSize(int(os.Stdin.Fd()))
+	if err != nil {
+		return "", fmt.Errorf("failed to get terminal size: %w", err)
+	}
+	tty.SetSize(width, height)
+
+	go func() {
+		for {
+			time.Sleep(1 * time.Second)
+			tty.Write([]byte("test \n"))
+		}
+	}()
+
 	line, err := tty.ReadLine()
 	_ = term.Restore(int(os.Stdin.Fd()), oldState)
 
@@ -43,10 +58,9 @@ func main() {
 
 	defer db.Close()
 
-	line, err := readLine()
+	line, err := readLine("> ")
 	if err != nil {
-		panic(err)
+		log.Printf("failed to read line: %v\n", err)
 	}
 	fmt.Printf("%q\n", line)
-
 }
